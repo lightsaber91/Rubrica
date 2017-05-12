@@ -1,11 +1,8 @@
 package interfaccia;
 
 import javax.swing.*;
-
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.Vector;
 import classi.Database;
 import classi.Persona;
@@ -19,10 +16,12 @@ public class GUI {
 	private static JFrame rubrica_frame;
 	private static JFrame editor_frame;
 	private static Dimension dim;
-	private static JTable rubrica;
+	private static JTable rubrica = null;
 	private static Persona selected = null;
-	private static JScrollPane spTable;
+	private static JScrollPane spTable = null;
 	private static JPanel rubrica_panel;
+	
+	
 	public static void main(String[] args) {
 		
 		// Mi connetto al database
@@ -40,6 +39,23 @@ public class GUI {
 		login_frame.setVisible(true);
 	}
 	
+	public static void populateRubrica() {
+		persone = db.getRubrica(USER);
+	    Object rowData[][] = new Object[persone.size()][3];
+	    for (int i = 0; i<persone.size(); i++) {
+    		rowData[i][0] = persone.get(i).getNome(); 
+    		rowData[i][1] = persone.get(i).getCognome(); 
+    		rowData[i][2] = persone.get(i).getTelefono(); 
+	    }
+	    
+		Object columnNames[] = { "Nome", "Cognome", "Telefono" };
+		rubrica = new JTable(rowData, columnNames);
+		rubrica.setDefaultEditor(Object.class, null);
+		spTable = new JScrollPane(rubrica);
+		spTable.setBounds(1,26,800,550);
+		rubrica_panel.add(spTable);
+	}
+	
 	private static void initRubrica() {
 		rubrica_frame = new JFrame("Rubrica");
 		login_frame.setVisible(false);
@@ -52,7 +68,62 @@ public class GUI {
 		rubrica_frame.setVisible(true);
 		createEditorFrame();
 	}
-	
+
+	private static void placeRubrica(JPanel panel) {
+		panel.setLayout(null);
+		JToolBar toolbar = new JToolBar();
+		JButton nuovo = new JButton("Nuovo");
+		nuovo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selected = null;
+				showEditorFrame();
+			}
+		});
+		
+		JButton modifica = new JButton("Modifica");
+		modifica.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = rubrica.getSelectedRow();
+				if (index == -1) {
+				    JOptionPane.showMessageDialog(rubrica_panel, "Nessun contatto selezionato", "Errore", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					selected = persone.get(rubrica.getSelectedRow());
+					showEditorFrame();
+				}
+			}
+		});
+		
+		JButton elimina = new JButton("Elimina");
+		elimina.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int index = rubrica.getSelectedRow();
+				if (index == -1) {
+				    JOptionPane.showMessageDialog(rubrica_panel, "Nessun contatto selezionato", "Errore", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					selected = persone.get(rubrica.getSelectedRow());
+				    int result = JOptionPane.showConfirmDialog(rubrica_panel, "Eliminare la persona "+selected.getNome()+" "+selected.getCognome()+"?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+				    if(result == 0) {
+				    	db.removePersona(selected, USER);
+				    	populateRubrica();
+				    }
+				}
+			}
+		});
+		
+		toolbar.add(nuovo);
+		toolbar.add(modifica);
+		toolbar.add(elimina);
+		toolbar.setBounds(1, 1, 800, 25);
+		panel.add(toolbar);
+		
+		populateRubrica();
+	}
+		
 	public static void createEditorFrame() {
 		editor_frame = new JFrame("Editor");
 		JPanel panel = new JPanel();
@@ -84,18 +155,22 @@ public class GUI {
 
 		JTextField set_cognome = new JTextField();
 		set_cognome.setBounds(110, 65, 160, 25);
+		
 		panel.add(set_cognome);
 
 		JTextField set_telefono = new JTextField();
 		set_telefono.setBounds(110, 115, 160, 25);
+		
 		panel.add(set_telefono);
 
 		JTextField set_indirizzo = new JTextField();
 		set_indirizzo.setBounds(110, 165, 160, 25);
+		
 		panel.add(set_indirizzo);
 
 		JTextField set_eta = new JTextField();
 		set_eta.setBounds(110, 215, 160, 25);
+
 		panel.add(set_eta);
 		
 		JButton salva = new JButton("Salva");
@@ -107,21 +182,7 @@ public class GUI {
 					db.savePersona(p, USER);
 				}
 				else db.modifyPersona(selected, p, USER);
-				persone = db.getRubrica(USER);
-
-			    Object rowData[][] = new Object[persone.size()][3];
-			    for (int i = 0; i<persone.size(); i++) {
-		    		rowData[i][0] = persone.get(i).getNome(); 
-		    		rowData[i][1] = persone.get(i).getCognome(); 
-		    		rowData[i][2] = persone.get(i).getTelefono(); 
-			    }
-			    
-				Object columnNames[] = { "Nome", "Cognome", "Telefono" };
-				rubrica.removeAll();
-				spTable = new JScrollPane(rubrica);
-				spTable.setBounds(1,26,800,550);
-				rubrica_panel.add(spTable);
-//				rubrica.getModel().setDataVector(rowData, columnNames);
+				populateRubrica();
 				editor_frame.setVisible(false);
 			}
 		});
@@ -138,7 +199,6 @@ public class GUI {
 				set_indirizzo.setText("");
 				set_eta.setText("");
 				editor_frame.setVisible(false);
-				rubrica.removeAll();
 			}
 		});
 		annulla.setBounds(30, 270, 100, 25);
@@ -152,43 +212,26 @@ public class GUI {
 	
 	public static void showEditorFrame() {
 		editor_frame.setVisible(true);
-	}
-	
-	private static void placeRubrica(JPanel panel) {
-		panel.setLayout(null);
-		JToolBar toolbar = new JToolBar();
-		JButton nuovo = new JButton("Nuovo");
-		nuovo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				selected = null;
-				showEditorFrame();
-			}
-		});
-		
-		JButton modifica = new JButton("Modifica");
-		JButton elimina = new JButton("Elimina");
-		
-		
-		toolbar.add(nuovo);
-		toolbar.add(modifica);
-		toolbar.add(elimina);
-		toolbar.setBounds(1, 1, 800, 25);
-		panel.add(toolbar);
-		
-	    Object rowData[][] = new Object[persone.size()][3];
-	    for (int i = 0; i<persone.size(); i++) {
-    		rowData[i][0] = persone.get(i).getNome(); 
-    		rowData[i][1] = persone.get(i).getCognome(); 
-    		rowData[i][2] = persone.get(i).getTelefono(); 
-	    }
-	    
-		Object columnNames[] = { "Nome", "Cognome", "Telefono" };
-		rubrica = new JTable(rowData, columnNames);
-		rubrica.setDefaultEditor(Object.class, null);
-		spTable = new JScrollPane(rubrica);
-		spTable.setBounds(1,26,800,550);
-		panel.add(spTable);
+		Container pane = editor_frame.getContentPane();
+		JTextField nome = (JTextField) pane.getComponent(0).getComponentAt(110, 15);
+		JTextField cognome = (JTextField) pane.getComponent(0).getComponentAt(110, 65);
+		JTextField indirizzo = (JTextField) pane.getComponent(0).getComponentAt(110, 115);
+		JTextField telefono = (JTextField) pane.getComponent(0).getComponentAt(110, 165);
+		JTextField eta = (JTextField) pane.getComponent(0).getComponentAt(110, 215);
+		if (selected != null) {
+			nome.setText(selected.getNome());
+			cognome.setText(selected.getCognome());
+			indirizzo.setText(selected.getIndirizzo());
+			telefono.setText(selected.getTelefono());
+			eta.setText(Integer.toString(selected.getEta()));
+		}
+		else {
+			nome.setText("");
+			cognome.setText("");
+			indirizzo.setText("");
+			telefono.setText("");
+			eta.setText("");
+		}
 	}
 	
 	private static void placeLogin(JPanel panel) {
@@ -225,7 +268,6 @@ public class GUI {
 					USER = user;
 					System.out.println("Login riuscito");
 					// Prendo la lista di persone per quell'utente
-					persone = db.getRubrica(USER);
 					initRubrica();
 				}
 				else {

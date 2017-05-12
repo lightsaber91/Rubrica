@@ -74,13 +74,49 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	public void modifyPersona(Persona old, Persona p, String user) {
-
+		System.out.println(old+ "\n"+ p);
+		String update = "UPDATE rubrica SET nome=?, cognome=?, indirizzo=?, telefono=?, eta=? WHERE nome=? AND cognome=? AND indirizzo=? AND telefono=? AND eta=? AND rif_user=?";
+		PreparedStatement preparedStmt;
+		try {
+			preparedStmt = (PreparedStatement) connection.prepareStatement(update);
+		    preparedStmt.setString(1, p.getNome());
+		    preparedStmt.setString(2, p.getCognome());
+		    preparedStmt.setString(3, p.getIndirizzo());
+		    preparedStmt.setString(4, p.getTelefono());
+		    preparedStmt.setInt(5, p.getEta());
+		    preparedStmt.setString(6, old.getNome());
+		    preparedStmt.setString(7, old.getCognome());
+		    preparedStmt.setString(8, old.getIndirizzo());
+		    preparedStmt.setString(9, old.getTelefono());
+		    preparedStmt.setInt(10, old.getEta());
+		    preparedStmt.setString(11, user);
+	        preparedStmt.execute();
+	        System.out.println("Modifica persona effettuata:"+ p.toString());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
-
+	
+	public void removePersona(Persona p, String user) {
+		String delete = "DELETE FROM rubrica WHERE nome=? AND cognome=? AND indirizzo=? AND telefono=? AND eta=? AND rif_user=?";
+		PreparedStatement preparedStmt;
+		try {
+			preparedStmt = (PreparedStatement) connection.prepareStatement(delete);
+		    preparedStmt.setString(1, p.getNome());
+		    preparedStmt.setString(2, p.getCognome());
+		    preparedStmt.setString(3, p.getIndirizzo());
+		    preparedStmt.setString(4, p.getTelefono());
+		    preparedStmt.setInt(5, p.getEta());
+		    preparedStmt.setString(6, user);
+	        preparedStmt.execute();
+	        System.out.println("Eliniazione persona effettuata:"+ p.toString());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public Vector<Persona> getRubrica(String user) {
 		Vector<Persona> tmp = new Vector<Persona>();
