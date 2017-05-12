@@ -9,7 +9,8 @@ La persona deve mantenere le seguenti informazioni:
 -	telefono: stringa
 -	eta: intero
 
-Interfaccia grafica
+# Interfaccia grafica
+
 L’interfaccia dell’applicazione deve essere realizzata con la libreria java base SWING. Ci deve essere una finestra principale, che mostra una JTable con una riga per ogni persona. Le colonne devono mostrare solo nome, cognome e telefono. In basso ci devono essere tre bottoni:
 -	nuovo: serve per creare una nuova persona
 -	modifica: serve per modificare una persona esistente
@@ -23,9 +24,11 @@ Finestra principale, bottone elimina: questo bottone serve per l’eliminazione 
 Finestra editor persona, bottone salva: questo bottone salva i dati della persona, visualizzati in finestra. Il salvataggio modifica i dati della persona e chiude la finestra editor-persona.
 Finestra editor persona, bottone annulla: questo bottone chiude la finestra editor-persona senza salvare i dati della persona.
 
-Persistenza
+# Persistenza
+
 Dopo aver realizzato la parte logica e la parte di interfacce grafiche, totalmente funzionanti, bisogna implementare lo strato di persistenza della nostra applicazione. In assenza dello strato di persistenza, il nostro programma gestirebbe correttamente la gestione delle persone. Permetterebbe inserimenti e cancellazioni, ma allo spegnimento e riavvio, mostrerebbe sempre la rubrica vuota. Sarebbe dunque privo di memoria.
 Procederemo alla realizzazione della persistenza mediante salvataggio su file. Tramite la classe Scanner leggeremo da file e tramite la classe PrintStream scriveremo su file. Useremo la classe File per identificare il file. Nel file inseriremo il contenuto dei dati delle persone seguendo la seguente codifica:
+
 informazioni.txt ----------------------------------------------------------
 Steve;Jobs;via Cupertino 13;0612344;56
 Bill;Gates;via Redmond 10;06688989;60
@@ -37,7 +40,8 @@ Inoltre, ad ogni salvataggio di persona, nella finestra editor-persona, alcune c
 Si consiglia l’utilizzo di un programma IDE per lo sviluppo come Eclipse.
 Il programma rubrica dovrà essere esportato nel formato JAR come “runnable jar” e con il nome Rubrica.jar. Questo permetterà di eseguire il programma facendo semplicemente doppio-click, con una macchina dove è installata e configurata una JVM.
 
-Test
+# Test
+
 Prima di inviare il pacchetto Rubrica.jar, testarlo a fondo in ogni sua funzione. Provare i seguenti casi di test:
 1)	Apro programma, aggiungo persona, verifico la presenza in tabella
 2)	Apro programma, aggiungo persona, clicco su persona, faccio modifica, verifico che i dati escano in finestra editor-persona
@@ -46,7 +50,8 @@ Prima di inviare il pacchetto Rubrica.jar, testarlo a fondo in ogni sua funzione
 5)	Verifico tra un’apertura e la successiva che sul file informazioni.txt il contenuto sia corretto.
 6)	Verificare il funzionamento del programma anche su un computer diverso.
 
-Evoluzioni EXTRA
+# Evoluzioni EXTRA
+
 Chi terminasse rapidamente il progetto, e fosse interessato ad aggiungere funzionalità e valore a questo piccolo programmino, può trarre spunto dai seguenti suggerimenti, per inserire nuove caratteristiche. Non è necessario seguire l’ordine, si possono aggiungere funzionalità come si vuole e anche sulla base delle proprie competenze e piacere.
 1)	Modificare il salvataggio dati: non salvare su un singolo file “informazioni.txt”, ma salvare i dati, all’interno di una cartella “informazioni”, creando un file per ogni persona. E’ possibile salvare creando vari file con ordine progressivo “Persona1.txt”, “Persona2.txt”, etc… Oppure è possibile creare un file con nome “NOME-COGNOME.txt” per ogni persona. Attenzione a persone con uguale nome e cognome.
 2)	Creare una seconda classe di “dominio” Utente. Oltre alle Persona, avremo anche gli Utente, che contengono dati relativi all’utente che accede al software. Un utente dovrà avere un username e una passoword. Poi bisognerà creare una nuova piccola finestra per il login, che contiene i campi Utente e Passoword e il bottone LOGIN. Quando si avvia l’applicazione, l’unica finestra che dovrà essere mostrata sarà il login e non la finestra principale. Se un utente inserisce i dati di login corretti, la finestra di login si chiuderà e si aprirà la finestra principale, dando all’utente la libertà di usare il software. Se i dati di login non sono corretti, bisognerà mostrare un messaggio di “login errato” e non mostrare la finestra principale.
