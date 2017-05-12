@@ -1,6 +1,8 @@
 package interfaccia;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
@@ -41,19 +43,16 @@ public class GUI {
 	
 	public static void populateRubrica() {
 		persone = db.getRubrica(USER);
-	    Object rowData[][] = new Object[persone.size()][3];
-	    for (int i = 0; i<persone.size(); i++) {
-    		rowData[i][0] = persone.get(i).getNome(); 
-    		rowData[i][1] = persone.get(i).getCognome(); 
-    		rowData[i][2] = persone.get(i).getTelefono(); 
+		DefaultTableModel tableModel = (DefaultTableModel) rubrica.getModel();
+	    tableModel.setRowCount(0);
+	    for (int i = 0; i < persone.size(); i++) {
+	        String[] data = new String[3];
+	        data[0] = persone.get(i).getNome();
+	        data[1] = persone.get(i).getCognome();
+	        data[2] = persone.get(i).getTelefono();
+	        tableModel.addRow(data);
 	    }
-	    
-		Object columnNames[] = { "Nome", "Cognome", "Telefono" };
-		rubrica = new JTable(rowData, columnNames);
-		rubrica.setDefaultEditor(Object.class, null);
-		spTable = new JScrollPane(rubrica);
-		spTable.setBounds(1,26,800,550);
-		rubrica_panel.add(spTable);
+	    rubrica.setModel(tableModel);
 	}
 	
 	private static void initRubrica() {
@@ -120,7 +119,15 @@ public class GUI {
 		toolbar.add(elimina);
 		toolbar.setBounds(1, 1, 800, 25);
 		panel.add(toolbar);
-		
+		Object columnNames[] = { "Nome", "Cognome", "Telefono" }; 
+		rubrica = new JTable();
+		DefaultTableModel contactTableModel = (DefaultTableModel) rubrica.getModel();
+	    contactTableModel.setColumnIdentifiers(columnNames);
+	    rubrica.setDefaultEditor(Object.class, null);
+		spTable = new JScrollPane(rubrica);
+		spTable.setBounds(1,26,800,550);
+		rubrica_panel.add(spTable);
+
 		populateRubrica();
 	}
 		
@@ -215,8 +222,8 @@ public class GUI {
 		Container pane = editor_frame.getContentPane();
 		JTextField nome = (JTextField) pane.getComponent(0).getComponentAt(110, 15);
 		JTextField cognome = (JTextField) pane.getComponent(0).getComponentAt(110, 65);
-		JTextField indirizzo = (JTextField) pane.getComponent(0).getComponentAt(110, 115);
-		JTextField telefono = (JTextField) pane.getComponent(0).getComponentAt(110, 165);
+		JTextField indirizzo = (JTextField) pane.getComponent(0).getComponentAt(110, 165);
+		JTextField telefono = (JTextField) pane.getComponent(0).getComponentAt(110, 115);
 		JTextField eta = (JTextField) pane.getComponent(0).getComponentAt(110, 215);
 		if (selected != null) {
 			nome.setText(selected.getNome());
