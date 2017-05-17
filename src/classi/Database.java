@@ -1,5 +1,8 @@
 package classi;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,9 +16,17 @@ import com.mysql.jdbc.Statement;
 
 public class Database {
 
-	private static final String connectionString = "jdbc:mysql://localhost:3306/TestDB?user=user&password=password";
+	private static final String FILENAME = "config.ini";
+	private static String USER = null;
+	private static String IP = null;
+	private static String PASS = null;
+	private static String PORT = null;
+	private static String DB = null;
+	private static String connectionString = null;
 	private Connection connection = null;
 
+	
+	
 	private void createTables() {
 		String loginTable = "CREATE TABLE login " +
                 			"(id INTEGER not NULL AUTO_INCREMENT, " +
@@ -137,6 +148,46 @@ public class Database {
 	
 	public Database() {
 		
+		BufferedReader br = null;
+		FileReader fr = null;
+
+		try {
+
+			fr = new FileReader(FILENAME);
+			br = new BufferedReader(fr);
+
+			String sCurrentLine;
+
+			br = new BufferedReader(new FileReader(FILENAME));
+
+			while ((sCurrentLine = br.readLine()) != null) {
+				if (sCurrentLine.startsWith("IP="))
+					IP = sCurrentLine.split("=")[1];
+				else if (sCurrentLine.startsWith("PORT="))
+					PORT = sCurrentLine.split("=")[1];
+				else if (sCurrentLine.startsWith("DB_NAME="))
+					DB = sCurrentLine.split("=")[1];
+				else if (sCurrentLine.startsWith("USER="))
+					USER = sCurrentLine.split("=")[1];
+				else if (sCurrentLine.startsWith("PASS="))
+					PASS = sCurrentLine.split("=")[1];
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		finally {
+			try {
+				if (br != null)
+					br.close();
+				if (fr != null)
+					fr.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		connectionString = "jdbc:mysql://"+IP+":"+PORT+"/"+DB+"?user="+USER+"&password="+PASS;
+
 		try {
 		    Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
